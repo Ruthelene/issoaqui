@@ -44,17 +44,6 @@ static NoAVL *criarNoAVL(int valor) {
 
 /* ---------- rotações ---------- */
 
-/*
- * Rotação simples à direita (caso esquerda-esquerda):
- *
- *       z                y
- *      / \             /   \
- *     y   T4          x     z
- *    / \      →      / \   / \
- *   x   T3          T1 T2 T3  T4
- *  / \
- * T1  T2
- */
 static NoAVL *rotacaoDireita(NoAVL *z) {
     NoAVL *y = z->esq;
     NoAVL *T3 = y->dir;
@@ -67,17 +56,7 @@ static NoAVL *rotacaoDireita(NoAVL *z) {
     return y;
 }
 
-/*
- * Rotação simples à esquerda (caso direita-direita):
- *
- *     z                   y
- *    / \                 / \
- *   T1   y      →       z   x
- *       / \            / \ / \
- *      T2   x         T1 T2 T3 T4
- *          / \
- *         T3  T4
- */
+
 static NoAVL *rotacaoEsquerda(NoAVL *z) {
     NoAVL *y = z->dir;
     NoAVL *T2 = y->esq;
