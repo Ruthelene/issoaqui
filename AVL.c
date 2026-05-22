@@ -1,13 +1,5 @@
 #include "AVL.h"
 
-/* ================================================================
- * AVL.c  –  Árvore AVL (TAD)
- *
- * Convenção de fator de balanceamento (FB):
- *   FB = altura(subárvore direita) - altura(subárvore esquerda)
- *   Invariante AVL: FB ∈ {-1, 0, +1} para todo nó.
- * ================================================================ */
-
 /* ---------- utilitários internos ---------- */
 
 static int max2(int a, int b) { return a > b ? a : b; }
