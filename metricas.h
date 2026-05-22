@@ -16,4 +16,7 @@ void metricasImprimirTabela(const char *titulo,
                              int         n,
                              double      media);
 
+/* Retorna uso de memória RSS do processo em KB (-1 se indisponível). */
+long metricasMemoriaKB(void);
+
 #endif /* METRICAS_H */

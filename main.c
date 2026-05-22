@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 #include "ArvoreBinaria.h"
 #include "AVL.h"
 #include "Vetor.h"
 #include "metricas.h"
+#include "Pacote.h"
 
 /* ================================================================
  * Configurações
@@ -17,21 +17,32 @@
 #define NUM_ARVORES         10     /* questão 4 */
 
 /* ================================================================
- * QUESTÃO 1 — Caminhamentos na BST (~20 elementos)
+ * QUESTÃO 1 — Caminhamentos na BST (~20 elementos, gerados aleatoriamente)
  * ================================================================ */
 
-static void questao1(void) {
+void questao1(void) {
     puts("========================================");
     puts("QUESTAO 1 — Caminhamentos na BST");
     puts("========================================");
 
-    int elementos[] = {50, 30, 70, 20, 40, 60, 80, 10, 25, 35,
-                       45, 55, 65, 75, 90, 15, 22, 32, 42, 85};
-    int n = (int)(sizeof(elementos) / sizeof(elementos[0]));
+    const int N = 20;
+    const int RANGE = 200; /* valores entre 1 e 200 para evitar muitas colisões */
+
+    srand((unsigned int) time(NULL));
 
     No *raiz = NULL;
-    for (int i = 0; i < n; i++)
-        raiz = inserir(raiz, elementos[i]);
+    int inseridos = 0;
+    printf("Elementos inseridos: ");
+    while (inseridos < N) {
+        int v = (rand() % RANGE) + 1;
+        /* Só insere se não existir (para garantir exatamente N nós distintos) */
+        if (buscar(raiz, v) == NULL) {
+            printf("%d ", v);
+            raiz = inserir(raiz, v);
+            inseridos++;
+        }
+    }
+    puts("");
 
     printf("Altura da arvore: %d\n\n", altura(raiz));
 
@@ -54,47 +65,7 @@ static void questao1(void) {
  * QUESTÃO 2 — Simulação de recebimento de pacotes
  * ================================================================ */
 
-typedef struct NoPacote {
-    int   id;
-    char  dado[64];
-    struct NoPacote *esq;
-    struct NoPacote *dir;
-} NoPacote;
-
-static NoPacote * pacoteCriar(int id, const char *dado) {
-    NoPacote *p = (NoPacote *) malloc(sizeof(NoPacote));
-    if (!p) { perror("malloc NoPacote"); exit(EXIT_FAILURE); }
-    p->id  = id;
-    strncpy(p->dado, dado, sizeof(p->dado) - 1);
-    p->dado[sizeof(p->dado) - 1] = '\0';
-    p->esq = p->dir = NULL;
-    return p;
-}
-
-static NoPacote *pacoteInserir(NoPacote *raiz, int id, const char *dado) {
-    if (!raiz) return pacoteCriar(id, dado);
-    if (id < raiz->id)
-        raiz->esq = pacoteInserir(raiz->esq, id, dado);
-    else if (id > raiz->id)
-        raiz->dir = pacoteInserir(raiz->dir, id, dado);
-    return raiz;
-}
-
-static void pacoteMontarArquivo(NoPacote *raiz, FILE *f) {
-    if (!raiz) return;
-    pacoteMontarArquivo(raiz->esq, f);
-    fprintf(f, "ID %04d: %s\n", raiz->id, raiz->dado);
-    pacoteMontarArquivo(raiz->dir, f);
-}
-
-static void pacoteDestruir(NoPacote *raiz) {
-    if (!raiz) return;
-    pacoteDestruir(raiz->esq);
-    pacoteDestruir(raiz->dir);
-    free(raiz);
-}
-
-static void questao2(void) {
+void questao2(void) {
     puts("\n========================================");
     puts("QUESTAO 2 — Simulacao de pacotes de rede");
     puts("========================================");
@@ -108,6 +79,7 @@ static void questao2(void) {
     int ids[27];
     for (int i = 0; i < IDS_UNICOS; i++) ids[i] = i + 1;
 
+    /* Embaralha os IDs únicos */
     for (int i = IDS_UNICOS - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         int tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
@@ -119,7 +91,7 @@ static void questao2(void) {
            TOTAL_PACOTES, IDS_UNICOS);
 
     int dup_idx = 0, dup_pos[3] = {5, 12, 22};
-    int envios = 0, uniq = 0;
+    int uniq = 0;
 
     for (int pos = 0; pos < TOTAL_PACOTES; pos++) {
         int id;
@@ -135,15 +107,16 @@ static void questao2(void) {
 
         printf("  [pos=%02d] Recebido pacote ID=%d  dado='%s'\n", pos, id, dado);
         arvore = pacoteInserir(arvore, id, dado);
-        envios++;
     }
 
     const char *nome_arquivo = "arquivo_montado.txt";
     FILE *f = fopen(nome_arquivo, "w");
-    if (!f) { perror("fopen arquivo_montado.txt"); }
-    else {
+    if (!f) {
+        perror("fopen arquivo_montado.txt");
+    } else {
         pacoteMontarArquivo(arvore, f);
         fclose(f);
+        printf("Arquivo '%s' gerado com sucesso.\n", nome_arquivo);
     }
 
     pacoteDestruir(arvore);
@@ -153,22 +126,7 @@ static void questao2(void) {
  * QUESTÃO 3 — BST vs Busca Binária no Vetor (1 milhão de elementos)
  * ================================================================ */
 
-static long lerMemoriaKB(void) {
-    long kb = -1;
-    FILE *f = fopen("/proc/self/status", "r");
-    if (!f) return kb;
-    char linha[256];
-    while (fgets(linha, sizeof(linha), f)) {
-        if (strncmp(linha, "VmRSS:", 6) == 0) {
-            sscanf(linha + 6, "%ld", &kb);
-            break;
-        }
-    }
-    fclose(f);
-    return kb;
-}
-
-static void questao3(void) {
+void questao3(void) {
     puts("\n========================================");
     puts("QUESTAO 3 — BST vs Busca Binaria no Vetor");
     puts("========================================");
@@ -184,27 +142,27 @@ static void questao3(void) {
     }
 
     printf("Construindo vetor com %d elementos...\n", TAMANHO_GRANDE);
-    long memAntes = lerMemoriaKB();
+    long memAntes = metricasMemoriaKB();
 
     Vetor *v = vetorCriar(TAMANHO_GRANDE);
     for (int i = 0; i < TAMANHO_GRANDE; i++)
         vetorInserir(v, i, valores[i]);
     vetorOrdenar(v);
 
-    long memDepoisVetor = lerMemoriaKB();
+    long memDepoisVetor = metricasMemoriaKB();
 
     printf("Construindo BST com %d elementos...\n", TAMANHO_GRANDE);
     No *bst = NULL;
     for (int i = 0; i < TAMANHO_GRANDE; i++)
         bst = inserir(bst, valores[i]);
 
-    long memDepoisBST = lerMemoriaKB();
+    long memDepoisBST = metricasMemoriaKB();
     printf("Memoria (RSS) antes: %ld KB | apos vetor: %ld KB | apos BST: %ld KB\n",
            memAntes, memDepoisVetor, memDepoisBST);
 
     int busca[NUM_BUSCAS];
     for (int i = 0; i < BUSCAS_PRESENTES; i++)
-      busca[i] = valores[TAMANHO_GRANDE - 1 - i];
+        busca[i] = valores[TAMANHO_GRANDE - 1 - i];
     for (int i = BUSCAS_PRESENTES; i < NUM_BUSCAS; i++)
         busca[i] = -(i + 1);
 
@@ -228,7 +186,7 @@ static void questao3(void) {
     double mediaVetor = metricasMedia(temposVetor, NUM_BUSCAS);
     metricasImprimirTabela("Busca Binaria no Vetor", temposVetor, NUM_BUSCAS, mediaVetor);
 
-    long memFinal = lerMemoriaKB();
+    long memFinal = metricasMemoriaKB();
     printf("\nMemoria (RSS) menor observada: %ld KB | maior observada: %ld KB\n",
            memAntes < memDepoisVetor ? memAntes : memDepoisVetor,
            memDepoisBST > memFinal   ? memDepoisBST : memFinal);
@@ -242,7 +200,7 @@ static void questao3(void) {
  * QUESTÃO 4 — AVL vs BST: criação, altura e busca
  * ================================================================ */
 
-static void questao4(void) {
+void questao4(void) {
     puts("\n========================================");
     puts("QUESTAO 4 — AVL vs BST: criacao e busca");
     puts("========================================");
@@ -288,6 +246,7 @@ static void questao4(void) {
                tempoCriacaoBST[exec], hBST,
                tempoCriacaoAVL[exec], hAVL);
 
+        /* Buscas apenas na última execução */
         if (exec == NUM_ARVORES - 1) {
             int busca[NUM_BUSCAS];
             for (int i = 0; i < BUSCAS_PRESENTES; i++)

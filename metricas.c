@@ -1,6 +1,6 @@
 #include "metricas.h"
-#include <time.h> // Incluído para usar clock() e CLOCKS_PER_SEC
 #include <time.h>
+#include <string.h>
 
 double metricasAgora(void) {
     struct timespec ts;
@@ -8,7 +8,6 @@ double metricasAgora(void) {
     return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
-// Calcula a MÉDIA de um vetor de doubles de tamanho n.
 double metricasMedia(double *tempos, int n) {
     if (n <= 0) return 0.0;
     double soma = 0.0;
@@ -16,7 +15,6 @@ double metricasMedia(double *tempos, int n) {
     return soma / n;
 }
 
-// Imprime tabela simples: índice | tempo (s)
 void metricasImprimirTabela(const char *titulo,
                              double *tempos,
                              int n,
@@ -27,4 +25,19 @@ void metricasImprimirTabela(const char *titulo,
     for (int i = 0; i < n; i++)
         printf("%-10d | %20.9f\n", i + 1, tempos[i]);
     printf("%-10s | %20.9f\n", "MEDIA", media);
+}
+
+long metricasMemoriaKB(void) {
+    long kb = -1;
+    FILE *f = fopen("/proc/self/status", "r");
+    if (!f) return kb;
+    char linha[256];
+    while (fgets(linha, sizeof(linha), f)) {
+        if (strncmp(linha, "VmRSS:", 6) == 0) {
+            sscanf(linha + 6, "%ld", &kb);
+            break;
+        }
+    }
+    fclose(f);
+    return kb;
 }
