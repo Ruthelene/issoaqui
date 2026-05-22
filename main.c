@@ -109,6 +109,11 @@ void questao2(void) {
         arvore = pacoteInserir(arvore, id, dado);
     }
 
+    /* --- PRINT 1: ordem de chegada já foi impressa acima linha a linha --- */
+    /* --- PRINT 2: arquivo montado (ordem correta por ID) --- */
+    puts("\n--- Arquivo montado (ordem por ID) ---");
+    pacoteImprimirEmOrdem(arvore);
+
     const char *nome_arquivo = "arquivo_montado.txt";
     FILE *f = fopen(nome_arquivo, "w");
     if (!f) {
@@ -116,7 +121,7 @@ void questao2(void) {
     } else {
         pacoteMontarArquivo(arvore, f);
         fclose(f);
-        printf("Arquivo '%s' gerado com sucesso.\n", nome_arquivo);
+        printf("\nArquivo '%s' gravado com sucesso.\n", nome_arquivo);
     }
 
     pacoteDestruir(arvore);

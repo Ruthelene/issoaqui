@@ -20,6 +20,14 @@ NoPacote *pacoteInserir(NoPacote *raiz, int id, const char *dado) {
     return raiz;
 }
 
+/* Imprime todos os pacotes em ordem crescente de ID (caminhamento central). */
+void pacoteImprimirEmOrdem(NoPacote *raiz) {
+    if (!raiz) return;
+    pacoteImprimirEmOrdem(raiz->esq);
+    printf("  ID=%04d  dado='%s'\n", raiz->id, raiz->dado);
+    pacoteImprimirEmOrdem(raiz->dir);
+}
+
 void pacoteMontarArquivo(NoPacote *raiz, FILE *f) {
     if (!raiz) return;
     pacoteMontarArquivo(raiz->esq, f);

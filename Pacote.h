@@ -14,6 +14,7 @@ typedef struct NoPacote {
 
 NoPacote *pacoteCriar(int id, const char *dado);
 NoPacote *pacoteInserir(NoPacote *raiz, int id, const char *dado);
+void      pacoteImprimirEmOrdem(NoPacote *raiz);
 void      pacoteMontarArquivo(NoPacote *raiz, FILE *f);
 void      pacoteDestruir(NoPacote *raiz);
 
