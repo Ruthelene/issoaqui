@@ -1,9 +1,22 @@
 #include "metricas.h"
 #include <time.h> // Incluído para usar clock() e CLOCKS_PER_SEC
+#include <windows.h>
 
 // Retorna o tempo atual em segundos baseado nos ciclos de CPU.
+
 double metricasAgora(void) {
-    return (double)clock() / CLOCKS_PER_SEC;
+    static LARGE_INTEGER freq;
+    static int initialized = 0;
+
+    if (!initialized) {
+        QueryPerformanceFrequency(&freq);
+        initialized = 1;
+    }
+
+    LARGE_INTEGER counter;
+    QueryPerformanceCounter(&counter);
+
+    return (double)counter.QuadPart / freq.QuadPart;
 }
 
 // Calcula a MÉDIA de um vetor de doubles de tamanho n.
