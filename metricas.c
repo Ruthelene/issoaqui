@@ -27,7 +27,7 @@ void metricasImprimirTabela(const char *titulo,
     printf("%-10s | %20.9f\n", "MEDIA", media);
 }
 
-long metricasMemoriaKB(void) {
+long lerMemoriaKB(void) {
     long kb = -1;
     FILE *f = fopen("/proc/self/status", "r");
     if (!f) return kb;

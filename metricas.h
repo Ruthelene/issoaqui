@@ -15,6 +15,6 @@ void metricasImprimirTabela(const char *titulo,
                              double      media);
 
 
-long metricasMemoriaKB(void);
+long lerMemoriaKB(void);
 
 #endif 
