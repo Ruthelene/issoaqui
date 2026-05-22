@@ -1,22 +1,11 @@
 #include "metricas.h"
 #include <time.h> // Incluído para usar clock() e CLOCKS_PER_SEC
-#include <windows.h>
-
-// Retorna o tempo atual em segundos baseado nos ciclos de CPU.
+#include <time.h>
 
 double metricasAgora(void) {
-    static LARGE_INTEGER freq;
-    static int initialized = 0;
-
-    if (!initialized) {
-        QueryPerformanceFrequency(&freq);
-        initialized = 1;
-    }
-
-    LARGE_INTEGER counter;
-    QueryPerformanceCounter(&counter);
-
-    return (double)counter.QuadPart / freq.QuadPart;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
 // Calcula a MÉDIA de um vetor de doubles de tamanho n.
@@ -29,9 +18,9 @@ double metricasMedia(double *tempos, int n) {
 
 // Imprime tabela simples: índice | tempo (s)
 void metricasImprimirTabela(const char *titulo,
-                             double     *tempos,
-                             int         n,
-                             double      media) {
+                             double *tempos,
+                             int n,
+                             double media) {
     printf("\n=== %s ===\n", titulo);
     printf("%-10s | %20s\n", "Execucao", "Tempo (s)");
     printf("%-10s-+-%20s\n", "----------", "--------------------");

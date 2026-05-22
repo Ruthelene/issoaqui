@@ -3,9 +3,9 @@
 #include <string.h>
 #include <time.h>
 
-#include "arvoreBinaria.h"
-#include "avl.h"
-#include "vetor.h"
+#include "ArvoreBinaria.h"
+#include "AVL.h"
+#include "Vetor.h"
 #include "metricas.h"
 
 /* ================================================================
