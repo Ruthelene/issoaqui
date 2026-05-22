@@ -16,4 +16,4 @@ NoAVL *avlBuscar(NoAVL *raiz, int valor);
 int    avlAltura(NoAVL *raiz);
 void   avlDestruir(NoAVL *raiz);
 
-#endif /* AVL_H */
+#endif 
