@@ -11,19 +11,19 @@
 /* ================================================================
  * Configurações
  * ================================================================ */
-#define TAMANHO_GRANDE      1000000
-#define NUM_BUSCAS          30
-#define BUSCAS_PRESENTES    15     /* pelo menos 15 das 30 devem existir */
-#define NUM_ARVORES         10     /* questão 4 */
+#define TAMANHO_GRANDE 1000000
+#define NUM_BUSCAS 30
+#define BUSCAS_PRESENTES 15 /* pelo menos 15 das 30 devem existir */
+#define NUM_ARVORES 10 /* questão 4 */
 
 /* ================================================================
  * QUESTÃO 1 — Caminhamentos na BST (~20 elementos, gerados aleatoriamente)
  * ================================================================ */
 
 void questao1(void) {
-    puts("========================================");
-    puts("QUESTAO 1 — Caminhamentos na BST");
-    puts("========================================");
+    printf("\n===================================================\n");
+    printf(" QUESTAO 1 - Caminhamentos na BST\n");
+    printf("===================================================\n");
 
     const int N = 20;
     const int RANGE = 200; /* valores entre 1 e 200 para evitar muitas colisões */
@@ -32,7 +32,7 @@ void questao1(void) {
 
     No *raiz = NULL;
     int inseridos = 0;
-    printf("Elementos inseridos: ");
+    printf("\nElementos inseridos: ");
     while (inseridos < N) {
         int v = (rand() % RANGE) + 1;
         /* Só insere se não existir (para garantir exatamente N nós distintos) */
@@ -46,15 +46,15 @@ void questao1(void) {
 
     printf("Altura da arvore: %d\n\n", altura(raiz));
 
-    printf("Pre-fixado  (raiz, esq, dir): ");
+    printf("Pre-fixado (raiz, esq, dir): ");
     preOrdem(raiz);
     puts("");
 
-    printf("Central     (esq, raiz, dir): ");
+    printf("Central (esq, raiz, dir): ");
     emOrdem(raiz);
     puts("");
 
-    printf("Pos-fixado  (esq, dir, raiz): ");
+    printf("Pos-fixado (esq, dir, raiz): ");
     posOrdem(raiz);
     puts("");
 
@@ -66,12 +66,12 @@ void questao1(void) {
  * ================================================================ */
 
 void questao2(void) {
-    puts("\n========================================");
-    puts("QUESTAO 2 — Simulacao de pacotes de rede");
-    puts("========================================");
+    printf("\n===================================================\n");
+    printf(" QUESTAO 2 - Simulacao de pacotes de rede\n");
+    printf("===================================================\n");
 
     const int TOTAL_PACOTES = 30;
-    const int IDS_UNICOS    = 27;
+    const int IDS_UNICOS = 27;
 
     NoPacote *arvore = NULL;
     srand(42);
@@ -105,7 +105,7 @@ void questao2(void) {
             snprintf(dado, sizeof(dado), "Conteudo do id %d", id);
         }
 
-        printf("  [pos=%02d] Recebido pacote ID=%d  dado='%s'\n", pos, id, dado);
+        printf(" [pos=%02d] Recebido pacote ID=%d dado='%s'\n", pos, id, dado);
         arvore = pacoteInserir(arvore, id, dado);
     }
 
@@ -130,89 +130,134 @@ void questao2(void) {
 /* ================================================================
  * QUESTÃO 3 — BST vs Busca Binária no Vetor (1 milhão de elementos)
  * ================================================================ */
-
 void questao3(void) {
-    puts("\n========================================");
-    puts("QUESTAO 3 — BST vs Busca Binaria no Vetor");
-    puts("========================================");
+    printf("\n===================================================\n");
+    printf(" QUESTAO 3 - BST vs Busca Binaria no Vetor\n");
+    printf("===================================================\n");
 
     srand(12345);
-    int *valores = (int *) malloc(sizeof(int) * TAMANHO_GRANDE);
+
+    Vetor *valores, *vetor, *valoresBusca, *status;
+    double temposBST[NUM_BUSCAS], temposVetor[NUM_BUSCAS];
+
+    valores = vetorCriar(TAMANHO_GRANDE);
     if (!valores) { perror("malloc valores q3"); exit(EXIT_FAILURE); }
 
-    for (int i = 0; i < TAMANHO_GRANDE; i++) valores[i] = i + 1;
-    for (int i = TAMANHO_GRANDE - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        int tmp = valores[i]; valores[i] = valores[j]; valores[j] = tmp;
+    //preencher vetor
+    for (int i = 0; i < TAMANHO_GRANDE; i++){
+        vetorInserir(valores, i, i + 1);
     }
 
-    printf("Construindo vetor com %d elementos...\n", TAMANHO_GRANDE);
-    long memAntes = metricasMemoriaKB();
+    //preencher vetor
+    for (int i = TAMANHO_GRANDE - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int tmp = valores->dados[i]; 
+        vetorInserir(valores, i, valores->dados[j]);
+        vetorInserir(valores, j, tmp);
+    }
 
-    Vetor *v = vetorCriar(TAMANHO_GRANDE);
-    for (int i = 0; i < TAMANHO_GRANDE; i++)
-        vetorInserir(v, i, valores[i]);
-    vetorOrdenar(v);
+    printf("\nConstruindo vetor com %d elementos...\n", TAMANHO_GRANDE);
 
-    long memDepoisVetor = metricasMemoriaKB();
+    long memAntes = lerMemoriaKB();
+
+    vetor = vetorCriar(TAMANHO_GRANDE);
+    for (int i = 0; i < TAMANHO_GRANDE; i++){
+        vetorInserir(vetor, i, i + 1);
+    }
+
+    long memDepoisVetor = lerMemoriaKB();
 
     printf("Construindo BST com %d elementos...\n", TAMANHO_GRANDE);
     No *bst = NULL;
+
+    //preenchendo árvore
     for (int i = 0; i < TAMANHO_GRANDE; i++)
-        bst = inserir(bst, valores[i]);
+        bst = inserir(bst, valores->dados[i]);
 
-    long memDepoisBST = metricasMemoriaKB();
-    printf("Memoria (RSS) antes: %ld KB | apos vetor: %ld KB | apos BST: %ld KB\n",
-           memAntes, memDepoisVetor, memDepoisBST);
+    long memDepoisBST = lerMemoriaKB();
+    
+    printf("\n\n=> Memoria(RSS):\n");
+    printf("Inicial: %ld KB\n", memAntes);
+    printf("Apos vetor: %ld KB\n", memDepoisVetor);
+    printf("Apos BST: %ld KB\n\n", memDepoisBST);
 
-    int busca[NUM_BUSCAS];
-    for (int i = 0; i < BUSCAS_PRESENTES; i++)
-        busca[i] = valores[TAMANHO_GRANDE - 1 - i];
-    for (int i = BUSCAS_PRESENTES; i < NUM_BUSCAS; i++)
-        busca[i] = -(i + 1);
+    valoresBusca = vetorCriar(NUM_BUSCAS);
+    status = vetorCriar(NUM_BUSCAS);
 
-    /* ----- buscas na BST ----- */
-    double temposBST[NUM_BUSCAS];
+    for (int i = 0; i < BUSCAS_PRESENTES; i++){
+       vetorInserir(valoresBusca, i, valores->dados[TAMANHO_GRANDE - 1 - i]);
+    }
+
+    for (int i = BUSCAS_PRESENTES; i < NUM_BUSCAS; i++){
+       vetorInserir(valoresBusca, i, -(i + 1));
+    }
+    printf("Tabela: Arvore Binaria de Pesquisa (BST) x Busca Binaria no Vetor\n");
+    printf("-----------+----------------------+----------------------+------------------\n");
+    printf("%-10s | %20s | %20s | %15s\n", " Busca ", " Tempo BST (s) ", " Tempo Vetor (s) ", " Status ");
+    printf("-----------+----------------------+----------------------+------------------\n");
+
+    int result;
+    
     for (int i = 0; i < NUM_BUSCAS; i++) {
+        /* ----- buscas na BST ----- */
         double t0 = metricasAgora();
-        buscar(bst, busca[i]);
+        buscar(bst, valoresBusca->dados[i]);
         temposBST[i] = metricasAgora() - t0;
-    }
-    double mediaBST = metricasMedia(temposBST, NUM_BUSCAS);
-    metricasImprimirTabela("Busca na BST", temposBST, NUM_BUSCAS, mediaBST);
 
-    /* ----- buscas no vetor ----- */
-    double temposVetor[NUM_BUSCAS];
-    for (int i = 0; i < NUM_BUSCAS; i++) {
-        double t0 = metricasAgora();
-        vetorBuscaBinaria(v, busca[i]);
+        /* ----- buscas na Arvore ----- */
+        t0 = metricasAgora();
+        result = vetorBuscaBinaria(vetor, valoresBusca->dados[i]);
         temposVetor[i] = metricasAgora() - t0;
-    }
-    double mediaVetor = metricasMedia(temposVetor, NUM_BUSCAS);
-    metricasImprimirTabela("Busca Binaria no Vetor", temposVetor, NUM_BUSCAS, mediaVetor);
 
-    long memFinal = metricasMemoriaKB();
+        if(i<10) {
+            if(result != -1){
+                 printf(" %d | %.12lf | %.12lf | Encontrado \n", i, temposBST[i], temposVetor[i]);
+            } else {
+                 printf(" %d | %.12lf | %.12lf | Nao encontrado \n", i, temposBST[i], temposVetor[i]);
+            }
+           
+        } else {
+            if(result != -1){
+                printf(" %d | %.12lf | %.12lf | Encontrado \n", i, temposBST[i], temposVetor[i]);
+            } else {
+                printf(" %d | %.12lf | %.12lf | Nao encontrado \n", i, temposBST[i], temposVetor[i]);
+            }
+        }
+    }
+
+    double mediaVetor = metricasMedia(temposVetor, NUM_BUSCAS);
+    double mediaBST = metricasMedia(temposBST, NUM_BUSCAS);
+    
+    printf("-----------+----------------------+----------------------+------------------\n");          
+    printf(" Media | %.12lf | %.12lf |\n", mediaBST, mediaVetor);
+    printf("-----------+----------------------+----------------------+------------------\n");
+    
+    long memFinal = lerMemoriaKB();
+  
     printf("\nMemoria (RSS) menor observada: %ld KB | maior observada: %ld KB\n",
            memAntes < memDepoisVetor ? memAntes : memDepoisVetor,
-           memDepoisBST > memFinal   ? memDepoisBST : memFinal);
+           memDepoisBST > memFinal ? memDepoisBST : memFinal);
 
     destruirArvore(bst);
-    vetorDestruir(v);
+    vetorDestruir(vetor);
     free(valores);
 }
+
 
 /* ================================================================
  * QUESTÃO 4 — AVL vs BST: criação, altura e busca
  * ================================================================ */
 
 void questao4(void) {
-    puts("\n========================================");
-    puts("QUESTAO 4 — AVL vs BST: criacao e busca");
-    puts("========================================");
+    printf("\n===================================================\n");
+    printf(" QUESTAO 4 - AVL vs BST: criacao e busca \n");
+    printf("===================================================\n");
 
     srand(99999);
+
     int *valores = (int *) malloc(sizeof(int) * TAMANHO_GRANDE);
     if (!valores) { perror("malloc valores q4"); exit(EXIT_FAILURE); }
+
     for (int i = 0; i < TAMANHO_GRANDE; i++) valores[i] = i + 1;
     for (int i = TAMANHO_GRANDE - 1; i > 0; i--) {
         int j = rand() % (i + 1);
@@ -222,12 +267,17 @@ void questao4(void) {
     double tempoCriacaoBST[NUM_ARVORES];
     double tempoCriacaoAVL[NUM_ARVORES];
 
-    printf("\n=== Criacao das arvores (10 execucoes) ===\n");
-    printf("%-10s | %20s | %10s | %20s | %10s\n",
-           "Execucao", "Tempo BST (s)", "Altura BST", "Tempo AVL (s)", "Altura AVL");
-    printf("%-10s-+-%20s-+-%10s-+-%20s-+-%10s\n",
+    printf("\nTabela: Criacao das arvores (10 execucoes)\n");
+
+     printf("%-10s-+-%20s-+-%10s-+-%20s-+-%10s\n",
            "----------", "--------------------",
            "----------", "--------------------", "----------");
+    printf("%-10s | %20s | %10s | %20s | %10s\n",
+           "Execucao", "Tempo BST (s)", "Altura BST", "Tempo AVL (s)", "Altura AVL");
+    printf("%-10s-+-%20s-+-%10s-+-%20s-+-%10s\n","----------", "--------------------","----------", "--------------------", "----------");
+
+    double temposBST[NUM_BUSCAS];
+    double temposAVL[NUM_BUSCAS];
 
     for (int exec = 0; exec < NUM_ARVORES; exec++) {
         /* BST */
@@ -259,9 +309,6 @@ void questao4(void) {
             for (int i = BUSCAS_PRESENTES; i < NUM_BUSCAS; i++)
                 busca[i] = -(i + 1);
 
-            double temposBST[NUM_BUSCAS];
-            double temposAVL[NUM_BUSCAS];
-
             for (int i = 0; i < NUM_BUSCAS; i++) {
                 double tb = metricasAgora();
                 buscar(bst, busca[i]);
@@ -270,25 +317,36 @@ void questao4(void) {
                 double ta = metricasAgora();
                 avlBuscar(avl, busca[i]);
                 temposAVL[i] = metricasAgora() - ta;
-            }
-
-            double mediaBST = metricasMedia(temposBST, NUM_BUSCAS);
-            double mediaAVL = metricasMedia(temposAVL, NUM_BUSCAS);
-
-            metricasImprimirTabela("Busca na BST (30 consultas)",
-                                   temposBST, NUM_BUSCAS, mediaBST);
-            metricasImprimirTabela("Busca na AVL (30 consultas)",
-                                   temposAVL, NUM_BUSCAS, mediaAVL);
+            }         
         }
 
         destruirArvore(bst);
         avlDestruir(avl);
     }
-
+    double mediaBST = metricasMedia(temposBST, NUM_BUSCAS);
+    double mediaAVL = metricasMedia(temposAVL, NUM_BUSCAS);  
     double mediaCriacaoBST = metricasMedia(tempoCriacaoBST, NUM_ARVORES);
     double mediaCriacaoAVL = metricasMedia(tempoCriacaoAVL, NUM_ARVORES);
-    printf("%-10s | %20.9f | %10s | %20.9f | %10s\n",
-           "MEDIA", mediaCriacaoBST, "-", mediaCriacaoAVL, "-");
+
+    printf("-----------+----------------------+------------+----------------------+-----------\n");
+    printf(" Media | %20.9f | | %20.9f | \n", mediaCriacaoBST, mediaCriacaoAVL);
+    printf("-----------+----------------------+------------+----------------------+-----------\n");
+
+    printf("\nTabela: Busca na Arvore Binaria de Pesquisa (BST) x Busca na Arvore AVL\n");
+    printf("-----------+----------------------+----------------------\n");
+    printf("%-10s | %20s | %20s \n", " Busca ", " Tempo BST (s) ", " Tempo AVL (s) ");
+    printf("-----------+----------------------+----------------------\n");
+
+    for (int i = 0; i < NUM_BUSCAS; i++) {
+        if(i<10) {
+            printf(" %d | %.12lf | %.12lf \n", i, temposBST[i], temposAVL[i]);
+        } else {
+            printf(" %d | %.12lf | %.12lf \n", i, temposBST[i], temposAVL[i]);
+        }
+    }
+    printf("-----------+----------------------+----------------------\n");          
+    printf(" Media | %.12lf | %.12lf \n", mediaBST, mediaAVL);
+    printf("-----------+----------------------+----------------------\n");
 
     free(valores);
 }
