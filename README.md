@@ -25,7 +25,7 @@ Toda a implementação foi desenvolvida seguindo os conceitos de **Tipos Abstrat
 raiz do projeto (`work2-aed2/`) para executar o comando abaixo:
 
 ```bash
-gcc main.c arvoreBinaria.c avl.c metricas.c vetor.c Pacote.c -o prog
+gcc main.c ArvoreBinaria.c AVL.c metricas.c Vetor.c Pacote.c -o prog
 ./prog
 ```
 
