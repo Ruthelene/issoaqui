@@ -175,11 +175,6 @@ void questao3(void) {
         bst = inserir(bst, valores->dados[i]);
 
     long memDepoisBST = lerMemoriaKB();
-    
-    printf("\n\n=> Memoria(RSS):\n");
-    printf("Inicial: %ld KB\n", memAntes);
-    printf("Apos vetor: %ld KB\n", memDepoisVetor);
-    printf("Apos BST: %ld KB\n\n", memDepoisBST);
 
     valoresBusca = vetorCriar(NUM_BUSCAS);
     status = vetorCriar(NUM_BUSCAS);
@@ -234,10 +229,6 @@ void questao3(void) {
     
     long memFinal = lerMemoriaKB();
   
-    printf("\nMemoria (RSS) menor observada: %ld KB | maior observada: %ld KB\n",
-           memAntes < memDepoisVetor ? memAntes : memDepoisVetor,
-           memDepoisBST > memFinal ? memDepoisBST : memFinal);
-
     destruirArvore(bst);
     vetorDestruir(vetor);
     free(valores);
