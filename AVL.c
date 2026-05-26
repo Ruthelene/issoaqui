@@ -6,11 +6,8 @@ static int max2(int a, int b) { return a > b ? a : b; }
 
 static int alturaNo(NoAVL *n) {
     return (n == NULL) ? -1 : n->fatorBalanceamento;
-    /* Reaproveitamos o campo fatorBalanceamento para guardar a altura real.
-       O nome do campo é herdado do .h; internamente tratamos como altura. */
 }
 
-/* Recalcula a altura armazenada no nó a partir dos filhos. */
 static void atualizarAltura(NoAVL *n) {
     if (n)
         n->fatorBalanceamento = 1 + max2(alturaNo(n->esq), alturaNo(n->dir));
